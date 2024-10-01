@@ -8,6 +8,8 @@ export const formatStatusIntoText = (status: TimeStatus) => {
       return "Pending"
     case "approved":
       return "Approved"
+    case "denied":
+      return "Denied"
     default:
       return "Invalid Status"
   }

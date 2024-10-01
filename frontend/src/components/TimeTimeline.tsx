@@ -13,10 +13,10 @@ import {
   formatMinuteDurationToString,
 } from "../utils/timeHelpers"
 import { Tooltip, Typography } from "@mui/material"
-import { TimeType } from "../types/Time"
+import { Time } from "../interfaces/time.interface"
 
 type Props = {
-  time: TimeType
+  time: Time
 }
 
 const TimeTimeline = (props: Props) => {

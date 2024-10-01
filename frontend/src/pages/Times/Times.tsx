@@ -1,5 +1,11 @@
 import { Add } from "@mui/icons-material"
-import { Box, Button, Container, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Typography,
+} from "@mui/material"
 import {
   DataGrid,
   gridClasses,
@@ -7,13 +13,13 @@ import {
   GridEventListener,
   GridRowsProp,
 } from "@mui/x-data-grid"
+import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { DUMMY_TIMES } from "../../data/DUMMY_TIMES"
+import { getTimes } from "../../api/timesApi"
 import { formatDateIntoString } from "../../utils/dateHelpers"
 import { formatStatusIntoText } from "../../utils/stringHelpers"
 import { formatMinuteDurationToString } from "../../utils/timeHelpers"
-
-type Props = {}
+import Loader from "../../components/Loader"
 
 const columns: GridColDef[] = [
   {
@@ -35,17 +41,31 @@ const columns: GridColDef[] = [
   },
 ]
 
-const rows: GridRowsProp = DUMMY_TIMES.map((time) => {
-  const { id, date, status } = time
-  const duration = time.blocks.reduce((a, b) => a + b.duration, 0)
-
-  const fDuration = formatMinuteDurationToString(duration)
-
-  return { id, date, status, duration: fDuration }
-})
-
-const Times = (props: Props) => {
+const Times = () => {
+  const userId = 0
   const navigate = useNavigate()
+
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["times", { userId }],
+    queryFn: () => getTimes(userId),
+  })
+
+  if (isPending) {
+    return <Loader />
+  }
+
+  if (isError) {
+    return <Typography>Error: {error.message}</Typography>
+  }
+
+  const rows: GridRowsProp = data?.map((time) => {
+    const { id, date, status } = time
+    const duration = time.blocks.reduce((a, b) => a + b.duration, 0)
+
+    const fDuration = formatMinuteDurationToString(duration)
+
+    return { id, date, status, duration: fDuration }
+  })
 
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     navigate({ to: params.row.id.toString() })

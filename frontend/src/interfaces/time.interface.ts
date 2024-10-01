@@ -1,14 +1,12 @@
 export type TimeStatus = "draft" | "pending" | "approved" | "denied"
 
-export type TimeType = {
+export interface Time {
   id: number
-  uid: number
-  date: Date
+  userId: number
+  date: number
   blocks: {
-    description: {
-      short: string
-      long?: string
-    }
+    descShort: string
+    descLong: string
     duration: number
     start: number
   }[]

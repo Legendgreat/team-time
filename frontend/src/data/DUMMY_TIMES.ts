@@ -3,8 +3,8 @@ import { TimeType } from "../types/Time"
 export const DUMMY_TIMES: TimeType[] = [
   {
     id: 0,
-    uid: 0,
-    date: new Date("2024-09-27"),
+    userId: 0,
+    date: new Date("2024-09-27").getTime(),
     blocks: [
       {
         description: {
@@ -42,8 +42,8 @@ export const DUMMY_TIMES: TimeType[] = [
   },
   {
     id: 1,
-    uid: 0,
-    date: new Date("2024-09-23"),
+    userId: 0,
+    date: new Date("2024-09-23").getTime(),
     blocks: [
       {
         description: {
@@ -55,5 +55,67 @@ export const DUMMY_TIMES: TimeType[] = [
     ],
     status: "approved",
     managerCommentary: "",
+  },
+  {
+    id: 2,
+    userId: 0,
+    date: new Date("2024-09-29").getTime(),
+    blocks: [
+      {
+        description: {
+          short: "Code",
+        },
+        duration: 60,
+        start: 540,
+      },
+      {
+        description: {
+          short: "Break",
+        },
+        duration: 30,
+        start: 600,
+      },
+      {
+        description: {
+          short: "Code",
+          long: "Worked on project Team Time",
+        },
+        duration: 90,
+        start: 630,
+      },
+    ],
+    status: "denied",
+    managerCommentary: "You didn't work on Team Time at 10:30am.",
+  },
+  {
+    id: 3,
+    userId: 1,
+    date: new Date("2024-09-29").getTime(),
+    blocks: [
+      {
+        description: {
+          short: "Code",
+        },
+        duration: 60,
+        start: 540,
+      },
+      {
+        description: {
+          short: "Break",
+        },
+        duration: 30,
+        start: 600,
+      },
+      {
+        description: {
+          short: "Code",
+          long: "Worked on project Team Time",
+        },
+        duration: 90,
+        start: 630,
+      },
+    ],
+    status: "denied",
+    managerCommentary: "You didn't work on Team Time at 10:30am.",
   },
 ]

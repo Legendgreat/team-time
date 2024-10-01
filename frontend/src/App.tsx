@@ -1,9 +1,10 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router"
 import React from "react"
 import { routeTree } from "./routeTree.gen"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 const TanStackRouterDevtools =
-  process.env.NODE_ENV === "production"
+  import.meta.env.NODE_ENV === "production"
     ? () => null
     : React.lazy(() =>
         import("@tanstack/router-devtools").then((res) => ({
@@ -22,11 +23,15 @@ declare module "@tanstack/react-router" {
   }
 }
 
+const queryClient = new QueryClient()
+
 const App = () => {
   return (
     <>
-      <RouterProvider router={router} />
-      <TanStackRouterDevtools router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <TanStackRouterDevtools router={router} />
+      </QueryClientProvider>
     </>
   )
 }

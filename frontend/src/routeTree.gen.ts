@@ -14,7 +14,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as TimesIndexImport } from './routes/times/index'
 import { Route as TeamIndexImport } from './routes/team/index'
-import { Route as TimesTimeIdImport } from './routes/times/$timeId'
+import { Route as TimesTimeIdIndexImport } from './routes/times/$timeId/index'
+import { Route as TimesTimeIdEditImport } from './routes/times/$timeId/edit'
 
 // Create/Update Routes
 
@@ -33,8 +34,13 @@ const TeamIndexRoute = TeamIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const TimesTimeIdRoute = TimesTimeIdImport.update({
-  path: '/times/$timeId',
+const TimesTimeIdIndexRoute = TimesTimeIdIndexImport.update({
+  path: '/times/$timeId/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TimesTimeIdEditRoute = TimesTimeIdEditImport.update({
+  path: '/times/$timeId/edit',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -47,13 +53,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/times/$timeId': {
-      id: '/times/$timeId'
-      path: '/times/$timeId'
-      fullPath: '/times/$timeId'
-      preLoaderRoute: typeof TimesTimeIdImport
       parentRoute: typeof rootRoute
     }
     '/team/': {
@@ -70,6 +69,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TimesIndexImport
       parentRoute: typeof rootRoute
     }
+    '/times/$timeId/edit': {
+      id: '/times/$timeId/edit'
+      path: '/times/$timeId/edit'
+      fullPath: '/times/$timeId/edit'
+      preLoaderRoute: typeof TimesTimeIdEditImport
+      parentRoute: typeof rootRoute
+    }
+    '/times/$timeId/': {
+      id: '/times/$timeId/'
+      path: '/times/$timeId'
+      fullPath: '/times/$timeId'
+      preLoaderRoute: typeof TimesTimeIdIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -77,47 +90,58 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/times/$timeId': typeof TimesTimeIdRoute
   '/team': typeof TeamIndexRoute
   '/times': typeof TimesIndexRoute
+  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
+  '/times/$timeId': typeof TimesTimeIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/times/$timeId': typeof TimesTimeIdRoute
   '/team': typeof TeamIndexRoute
   '/times': typeof TimesIndexRoute
+  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
+  '/times/$timeId': typeof TimesTimeIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/times/$timeId': typeof TimesTimeIdRoute
   '/team/': typeof TeamIndexRoute
   '/times/': typeof TimesIndexRoute
+  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
+  '/times/$timeId/': typeof TimesTimeIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/times/$timeId' | '/team' | '/times'
+  fullPaths: '/' | '/team' | '/times' | '/times/$timeId/edit' | '/times/$timeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/times/$timeId' | '/team' | '/times'
-  id: '__root__' | '/' | '/times/$timeId' | '/team/' | '/times/'
+  to: '/' | '/team' | '/times' | '/times/$timeId/edit' | '/times/$timeId'
+  id:
+    | '__root__'
+    | '/'
+    | '/team/'
+    | '/times/'
+    | '/times/$timeId/edit'
+    | '/times/$timeId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  TimesTimeIdRoute: typeof TimesTimeIdRoute
   TeamIndexRoute: typeof TeamIndexRoute
   TimesIndexRoute: typeof TimesIndexRoute
+  TimesTimeIdEditRoute: typeof TimesTimeIdEditRoute
+  TimesTimeIdIndexRoute: typeof TimesTimeIdIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  TimesTimeIdRoute: TimesTimeIdRoute,
   TeamIndexRoute: TeamIndexRoute,
   TimesIndexRoute: TimesIndexRoute,
+  TimesTimeIdEditRoute: TimesTimeIdEditRoute,
+  TimesTimeIdIndexRoute: TimesTimeIdIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -133,22 +157,26 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/times/$timeId",
         "/team/",
-        "/times/"
+        "/times/",
+        "/times/$timeId/edit",
+        "/times/$timeId/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/times/$timeId": {
-      "filePath": "times/$timeId.tsx"
     },
     "/team/": {
       "filePath": "team/index.tsx"
     },
     "/times/": {
       "filePath": "times/index.tsx"
+    },
+    "/times/$timeId/edit": {
+      "filePath": "times/$timeId/edit.tsx"
+    },
+    "/times/$timeId/": {
+      "filePath": "times/$timeId/index.tsx"
     }
   }
 }
