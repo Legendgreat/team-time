@@ -15,11 +15,11 @@ import {
 } from "@mui/x-data-grid"
 import { useQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import { getTimes } from "../../api/timesApi"
+import { createTime, getTimes } from "../../api/timesApi"
 import { formatDateIntoString } from "../../utils/dateHelpers"
 import { formatStatusIntoText } from "../../utils/stringHelpers"
 import { formatMinuteDurationToString } from "../../utils/timeHelpers"
-import Loader from "../../components/Loader"
+import Loader from "../../common/Loader"
 
 const columns: GridColDef[] = [
   {
@@ -47,7 +47,7 @@ const Times = () => {
 
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["times", { userId }],
-    queryFn: () => getTimes(userId),
+    queryFn: () => getTimes(),
   })
 
   if (isPending) {
@@ -72,6 +72,12 @@ const Times = () => {
     console.log(params.row.id)
   }
 
+  const newTimeHandler = () => {
+    createTime().then((time) => {
+      navigate({ to: time.id.toString() + "/edit" })
+    })
+  }
+
   return (
     <>
       <Container sx={{ mt: 5 }}>
@@ -87,7 +93,7 @@ const Times = () => {
               mb: 1,
             }}
           >
-            <Button sx={{ gap: 1 }}>
+            <Button onClick={newTimeHandler} sx={{ gap: 1 }}>
               <Add /> Add new time
             </Button>
           </Box>

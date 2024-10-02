@@ -1,5 +1,15 @@
-import { ArrowBack, Circle, Edit, History } from "@mui/icons-material"
 import {
+  ArrowBack,
+  Circle,
+  Delete,
+  Edit,
+  History,
+  TaskAlt,
+} from "@mui/icons-material"
+import {
+  Alert,
+  AlertColor,
+  AlertPropsColorOverrides,
   Box,
   Card,
   Chip,
@@ -12,23 +22,34 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Snackbar,
   Stack,
   Typography,
 } from "@mui/material"
 import Grid from "@mui/material/Grid2"
 import { useNavigate, useParams } from "@tanstack/react-router"
-import TimeTimeline from "../../components/TimeTimeline"
+import TimeTimeline from "../../common/TimeTimeline"
 import { formatDateIntoString } from "../../utils/dateHelpers"
 import { formatStatusIntoText } from "../../utils/stringHelpers"
 import { getTextColorFromStatus } from "../../utils/styleHelpers"
-import { getTimeById } from "../../api/timesApi"
-import { useQuery } from "@tanstack/react-query"
-import Loader from "../../components/Loader"
+import {
+  deleteTime,
+  getTimeById,
+  retractTime,
+  submitTime,
+} from "../../api/timesApi"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import Loader from "../../common/Loader"
+import Error from "../../common/Error/Error"
+import { AxiosError } from "axios"
+import { FetchError } from "../../interfaces/error.interface"
+import { useState } from "react"
+import DeleteDialog from "../../common/Dialogs/DeleteDialog"
+import Killed from "../../common/Killed"
 
-type Props = {}
-
-const TimeView = (props: Props) => {
+const TimeView = () => {
   const userId = 0
+  const qc = useQueryClient()
   const navigate = useNavigate()
   const { timeId } = useParams({ strict: false })
   const {
@@ -38,17 +59,102 @@ const TimeView = (props: Props) => {
     error,
   } = useQuery({
     queryKey: ["time", { userId, timeId }],
-    queryFn: () => getTimeById(userId, parseInt(timeId!)),
+    queryFn: () => getTimeById(parseInt(timeId!)),
+    throwOnError: (err: AxiosError & FetchError) => false,
   })
+
+  const [isDeleted, setIsDeleted] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState("This is a snackbar!")
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    (AlertColor & AlertPropsColorOverrides) | undefined
+  >("info")
 
   if (isPending) return <Loader />
 
   if (isError) {
-    return <Typography>Error: {error.message}</Typography>
+    return <Error error={error} />
+  }
+
+  if (isDeleted) {
+    let date = formatDateIntoString(time.date)
+    if (date == "Today" || date == "Yesterday") date = date.toLowerCase()
+
+    return <Killed message={`Your time from ${date} has been deleted.`} />
+  }
+
+  const submitHandler = () => {
+    submitTime(parseInt(timeId!)).then(() => {
+      qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
+    })
+  }
+
+  const retractHandler = () => {
+    retractTime(parseInt(timeId!)).then(() => {
+      qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
+    })
+  }
+
+  const openDelete = () => {
+    setDeleteDialogOpen(true)
+  }
+
+  const closeDelete = () => {
+    setDeleteDialogOpen(false)
+  }
+
+  const openSnackbar = () => {
+    setSnackbarOpen(true)
+  }
+
+  const closeSnackbar = () => {
+    setSnackbarOpen(false)
+  }
+
+  const deleteTimeHandler = () => {
+    setIsDeleted(true)
+    // deleteTime(parseInt(timeId!))
+    //   .then(() => {
+    //     qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
+    //     qc.invalidateQueries({ queryKey: ["times", { userId }] })
+    //     setIsDeleted(true)
+    //     setTimeout(() => {
+    //       navigate({ to: ".." })
+    //     }, 3000)
+    //   })
+    //   .catch(() => {
+    //     setSnackbarMessage("Failed to delete time.")
+    //     setSnackbarSeverity("error")
+    //     openSnackbar()
+    //   })
   }
 
   return (
     <Container sx={{ mt: 4 }}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={closeSnackbar}
+          severity={snackbarSeverity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={closeDelete}
+        onAccept={deleteTimeHandler}
+        title="Time"
+        itemDesc="this time"
+      />
       <Stack direction="row" spacing={2}>
         <IconButton size="small" onClick={() => navigate({ to: ".." })}>
           <ArrowBack />
@@ -107,11 +213,21 @@ const TimeView = (props: Props) => {
             <List>
               {time.status == "pending" && (
                 <ListItem disablePadding>
-                  <ListItemButton sx={{ px: 3 }} onClick={() => {}}>
+                  <ListItemButton sx={{ px: 3 }} onClick={retractHandler}>
                     <ListItemIcon sx={{ minWidth: "48px" }}>
                       <History />
                     </ListItemIcon>
                     <ListItemText>Retract</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              )}
+              {time.status == "draft" && (
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ px: 3 }} onClick={submitHandler}>
+                    <ListItemIcon sx={{ minWidth: "48px" }}>
+                      <TaskAlt />
+                    </ListItemIcon>
+                    <ListItemText>Submit</ListItemText>
                   </ListItemButton>
                 </ListItem>
               )}
@@ -131,6 +247,20 @@ const TimeView = (props: Props) => {
                   <ListItemText>Edit</ListItemText>
                 </ListItemButton>
               </ListItem>
+              {time.status == "draft" && (
+                <ListItem disablePadding>
+                  <ListItemButton
+                    sx={{ px: 3 }}
+                    onClick={openDelete}
+                    disabled={time.status != "draft"}
+                  >
+                    <ListItemIcon sx={{ minWidth: "48px" }}>
+                      <Delete />
+                    </ListItemIcon>
+                    <ListItemText>Delete</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              )}
             </List>
           </Card>
         </Grid>

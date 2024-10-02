@@ -75,7 +75,9 @@ const BasePage = (props: Props) => {
   }
 
   return (
-    <Paper sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <Paper
+      sx={{ display: "flex", flexDirection: "column", height: "100%", pb: 4 }}
+    >
       <Drawer open={open} onClose={() => toggleDrawer(false)}>
         <Box
           sx={{

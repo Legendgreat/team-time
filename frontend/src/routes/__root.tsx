@@ -1,5 +1,5 @@
 import { createRootRoute, Link } from "@tanstack/react-router"
-import Root from "../components/Root"
+import Root from "../common/Root"
 import { Container, Typography } from "@mui/material"
 
 export const Route = createRootRoute({

@@ -40,10 +40,8 @@ const TimeTimeline = (props: Props) => {
             )}
           </TimelineSeparator>
           <TimelineContent>
-            <Tooltip placement="top" title={block.description.long}>
-              <Typography component="span">
-                {block.description.short}
-              </Typography>
+            <Tooltip placement="top" title={block.description}>
+              <Typography component="span">{block.title}</Typography>
             </Tooltip>
           </TimelineContent>
         </TimelineItem>

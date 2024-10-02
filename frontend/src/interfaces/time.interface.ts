@@ -5,11 +5,16 @@ export interface Time {
   userId: number
   date: number
   blocks: {
-    descShort: string
-    descLong: string
+    title: string
+    description: string
     duration: number
     start: number
   }[]
   status: TimeStatus
   managerCommentary: string
+}
+
+export interface NewTime {
+  date: number
+  status: TimeStatus
 }

@@ -1,4 +1,4 @@
-import { DbModule } from './global/db.module'
+import { DbModule } from './common/modules/db.module'
 import { Module } from '@nestjs/common'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
