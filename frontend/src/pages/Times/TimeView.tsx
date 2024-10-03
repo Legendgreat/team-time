@@ -43,7 +43,7 @@ import Loader from "../../common/Loader"
 import Error from "../../common/Error/Error"
 import { AxiosError } from "axios"
 import { FetchError } from "../../interfaces/error.interface"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import DeleteDialog from "../../common/Dialogs/DeleteDialog"
 import Killed from "../../common/Killed"
 
@@ -63,6 +63,18 @@ const TimeView = () => {
     throwOnError: (err: AxiosError & FetchError) => false,
   })
 
+  const cancelRedirectTimer = () => {
+    clearTimeout(redirectTimerRef.current)
+  }
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) cancelRedirectTimer()
+    }
+  }, [])
+
+  const redirectTimerRef = useRef<NodeJS.Timeout>()
+
   const [isDeleted, setIsDeleted] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
@@ -78,11 +90,12 @@ const TimeView = () => {
     return <Error error={error} />
   }
 
+
   if (isDeleted) {
     let date = formatDateIntoString(time.date)
     if (date == "Today" || date == "Yesterday") date = date.toLowerCase()
 
-    return <Killed message={`Your time from ${date} has been deleted.`} />
+    return <Killed onCancelTimeout={cancelRedirectTimer} message={`Your time from ${date} has been deleted.`} />
   }
 
   const submitHandler = () => {
@@ -114,21 +127,19 @@ const TimeView = () => {
   }
 
   const deleteTimeHandler = () => {
-    setIsDeleted(true)
-    // deleteTime(parseInt(timeId!))
-    //   .then(() => {
-    //     qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
-    //     qc.invalidateQueries({ queryKey: ["times", { userId }] })
-    //     setIsDeleted(true)
-    //     setTimeout(() => {
-    //       navigate({ to: ".." })
-    //     }, 3000)
-    //   })
-    //   .catch(() => {
-    //     setSnackbarMessage("Failed to delete time.")
-    //     setSnackbarSeverity("error")
-    //     openSnackbar()
-    //   })
+    deleteTime(parseInt(timeId!))
+      .then(() => {
+        qc.invalidateQueries({ queryKey: ["times", { userId }] })
+        setIsDeleted(true)
+        redirectTimerRef.current = setTimeout(() => {
+          navigate({ to: "/times" })
+        }, 5000)
+      })
+      .catch(() => {
+        setSnackbarMessage("Failed to delete time.")
+        setSnackbarSeverity("error")
+        openSnackbar()
+      })
   }
 
   return (

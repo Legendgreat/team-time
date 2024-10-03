@@ -1,15 +1,30 @@
 import { Delete } from "@mui/icons-material"
-import { Container, Icon, Typography } from "@mui/material"
+import { Box, Container, Icon, Stack, Typography, useTheme } from "@mui/material"
 import { Link } from "@tanstack/react-router"
-import React from "react"
-import Ticker from "./Ticker"
+import React, { useEffect, useState } from "react"
+import FlipNumbers from "react-flip-numbers"
 
 type Props = {
   message: string
+  onCancelTimeout: () => void
 }
 
 const Killed = (props: Props) => {
-  const { message } = props
+  const { message, onCancelTimeout } = props
+
+  const [time, setTime] = useState(5)
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTime(oldTime => oldTime - 1)
+    }, 1000)
+    if (time == 0) clearInterval(interval)
+    return () => clearInterval(interval)
+  }, [time])
+
+  const theme = useTheme();
+
+  
 
   return (
     <Container
@@ -25,16 +40,23 @@ const Killed = (props: Props) => {
       <Icon sx={{ fontSize: "8rem" }}>
         <Delete sx={{ fontSize: "inherit" }} />{" "}
       </Icon>
-      <Typography variant="h5" sx={{ my: 2 }}>
+      <Typography variant="h5">
         {message}
       </Typography>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        Returning in <Ticker time={5} />
-        ...
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", mt: 2}}>
+        <Typography variant="h6" sx={{mr: 1}}>
+          Returning in
+        </Typography>
+        <FlipNumbers numberStyle={{fontWeight: "bold", WebkitFontSmoothing: 'subpixel-antialiased'}} duration={0.2} height={20} width={20} play color={theme.palette.text.primary} perspective={200} numbers={time.toString()} />
+        {time === 0 && 
+          <Typography variant="h6">
+            ...
+          </Typography>
+        }
+      </Box>
       <Typography variant="h6">
         Click{" "}
-        <Link to=".." activeOptions={{ exact: true }}>
+        <Link onClick={onCancelTimeout} to=".." activeOptions={{ exact: true }}>
           here
         </Link>{" "}
         to go back manually.

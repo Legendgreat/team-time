@@ -69,7 +69,6 @@ const Times = () => {
 
   const handleRowClick: GridEventListener<"rowClick"> = (params) => {
     navigate({ to: params.row.id.toString() })
-    console.log(params.row.id)
   }
 
   const newTimeHandler = () => {

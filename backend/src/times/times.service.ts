@@ -29,7 +29,6 @@ export class TimesService {
     time = { userId, ...time }
 
     const newTime = await this.timeRepository.save(time)
-    await this.timeRepository.save(newTime)
 
     return newTime
   }
@@ -96,7 +95,7 @@ export class TimesService {
       deletedTime = await this.timeRepository.softDelete(id)
     }
 
-    if (blocks) {
+    if (blocks.length > 0) {
       deletedBlocks = await this.blockRepository.softDelete(
         blocks.map((block) => block.id),
       )
