@@ -8,6 +8,7 @@ import {
   Slide,
 } from "@mui/material"
 import { TransitionProps } from "@mui/material/transitions"
+import { DialogProps } from "@toolpad/core/useDialogs"
 import React from "react"
 
 const Transition = React.forwardRef(
@@ -19,23 +20,24 @@ const Transition = React.forwardRef(
   }
 )
 
-type Props = {
-  open: boolean
-  onClose: () => void
+type Payload = {
   onAccept: () => void
   title?: string
   itemDesc?: string
 }
 
-const DeleteDialog = (props: Props) => {
-  const { open, onClose, onAccept, title, itemDesc } = props
+const DeleteDialog = (props: DialogProps<Payload>) => {
+  const { open, onClose } = props
+  const { onAccept, title, itemDesc } = props.payload
 
   return (
     <Dialog
       open={open}
       TransitionComponent={Transition}
       keepMounted
-      onClose={onClose}
+      onClose={() => {
+        onClose()
+      }}
       aria-describedby="delete-dialog-description"
     >
       <DialogTitle>{`Delete${title ? ` ${title}` : " Item"}`}</DialogTitle>
@@ -53,7 +55,13 @@ const DeleteDialog = (props: Props) => {
         >
           Accept
         </Button>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button
+          onClick={() => {
+            onClose()
+          }}
+        >
+          Cancel
+        </Button>
       </DialogActions>
     </Dialog>
   )

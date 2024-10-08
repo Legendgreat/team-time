@@ -10,6 +10,7 @@ export interface Time {
 }
 
 export interface Block {
+  id: number
   title: string
   description: string
   duration: number

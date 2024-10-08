@@ -26,18 +26,18 @@ const TimeTimeline = (props: Props) => {
       {time.blocks.map((block, index) => (
         <TimelineItem key={block.start}>
           <TimelineOppositeContent variant="caption">
-            {formatMinuteDurationToHourDisplay(block.start)}
+            <Tooltip
+              placement="top"
+              title={formatMinuteDurationToString(block.duration)}
+            >
+              <Typography component="span">
+                {formatMinuteDurationToHourDisplay(block.start)}
+              </Typography>
+            </Tooltip>
           </TimelineOppositeContent>
           <TimelineSeparator>
             <TimelineDot />
-            {index + 1 < time.blocks.length && (
-              <Tooltip
-                placement="left"
-                title={formatMinuteDurationToString(block.duration)}
-              >
-                <TimelineConnector />
-              </Tooltip>
-            )}
+            {index + 1 < time.blocks.length && <TimelineConnector />}
           </TimelineSeparator>
           <TimelineContent>
             <Tooltip placement="top" title={block.description}>

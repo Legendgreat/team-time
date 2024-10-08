@@ -11,6 +11,7 @@ export type DrawerList = {
   text: string
   icon?: ReactNode
   to?: string
+  logout?: boolean
 }[]
 
 export const baseDrawerList: DrawerList = [
@@ -49,5 +50,6 @@ export const footerDrawerList: DrawerList = [
   {
     text: "Logout",
     icon: <Logout />,
+    logout: true,
   },
 ]

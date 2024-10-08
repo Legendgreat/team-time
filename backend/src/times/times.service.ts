@@ -1,18 +1,20 @@
-/*
-https://docs.nestjs.com/providers#services
-*/
-
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable, Scope } from '@nestjs/common'
+import { REQUEST } from '@nestjs/core'
 import { InjectRepository } from '@nestjs/typeorm'
+import { BlockService } from 'src/blocks/block.service'
+import { IGetUserAuthInfoRequest } from 'src/guards/auth/auth.interface'
+import { Role } from 'src/guards/roles/role.enum'
+import { DeleteResult, Repository, UpdateResult } from 'typeorm'
+import { Block } from './../blocks/block.entity'
 import { Time } from './time.entity'
-import { DataSource, Repository, UpdateResult } from 'typeorm'
-import { UUID } from 'crypto'
-import { CreateTimeDto } from './dto/time.dto'
-import { Block } from '../blocks/block.entity'
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class TimesService {
   constructor(
+    @Inject(REQUEST)
+    private readonly request: IGetUserAuthInfoRequest,
+    @Inject(forwardRef(() => BlockService))
+    private blocksService: BlockService,
     @InjectRepository(Time)
     private readonly timeRepository: Repository<Time>,
     @InjectRepository(Block)
@@ -21,12 +23,22 @@ export class TimesService {
 
   private readonly times: Time[] = []
 
-  async create(dto: CreateTimeDto): Promise<Time> {
-    const { userId } = dto
+  private readonly findOptions = {
+    relations: {
+      blocks: true,
+    },
+    where: {
+      id: undefined,
+      user: undefined,
+    },
+  }
+
+  async create(): Promise<Time> {
+    const { user } = this.request
 
     let time = new Time()
 
-    time = { userId, ...time }
+    time = { user, ...time }
 
     const newTime = await this.timeRepository.save(time)
 
@@ -34,65 +46,94 @@ export class TimesService {
   }
 
   async findAll(): Promise<Time[]> {
-    const qb = this.timeRepository
-      .createQueryBuilder('time')
-      .select(['time'])
-      .leftJoin('time.blocks', 'blocks')
-      .addSelect([
-        'blocks.title',
-        'blocks.description',
-        'blocks.duration',
-        'blocks.start',
-      ])
-    const times = await qb.getMany()
+    const { user } = this.request
+
+    const findOptions = this.findOptions
+
+    if (user.role !== Role.Admin) {
+      findOptions.where.user = { id: user.id }
+    }
+
+    const times = this.timeRepository.find(findOptions)
+
     return times
   }
 
   async findOne(slug: any): Promise<Time> {
-    const id = slug
-    const qb = this.timeRepository
-      .createQueryBuilder('time')
-      .select(['time'])
-      .leftJoin('time.blocks', 'blocks')
-      .addSelect([
-        'blocks.title',
-        'blocks.description',
-        'blocks.duration',
-        'blocks.start',
-      ])
-      .where('time.id = :id', id)
+    const { id } = slug
 
-    const time = await qb.getOneOrFail().catch((err) => {
-      throw new HttpException(err, HttpStatus.NOT_FOUND)
-    })
+    const { user } = this.request
+
+    const findOptions = this.findOptions
+
+    findOptions.where.id = id
+
+    if (user.role !== Role.Admin) {
+      findOptions.where.user = { id: user.id }
+    }
+
+    const time = this.timeRepository.findOne(findOptions)
 
     return time
   }
 
-  async update(slug: any, body: any): Promise<Time> {
-    const id = slug
+  async update(slug: any, body: any): Promise<Time | Block[]> {
+    const { id } = slug
+    const { user } = this.request
     const { date, blocks, status, managerCommentary } = body
+    let updatedTime: Time, updatedBlocks: Block[]
 
-    let time = await this.timeRepository.findOneBy(id)
-    time = { ...time, date, status, managerCommentary }
+    const findOptions = this.findOptions
 
-    const updatedTime = await this.timeRepository.save(time)
-    return updatedTime
+    findOptions.where.id = id
+
+    if (user.role !== Role.Admin) {
+      findOptions.where.user = { id: user.id }
+    }
+
+    let time = await this.timeRepository.findOne(findOptions)
+    if (date || status || managerCommentary) {
+      time = { ...time, date, status, managerCommentary }
+      updatedTime = await this.timeRepository.save(time)
+    }
+    if (blocks) {
+      updatedBlocks = []
+      for (const block of blocks) {
+        const updatedBlock = await this.blocksService.updateOrCreate(
+          id.toString(),
+          block,
+        )
+
+        updatedBlocks.push(updatedBlock)
+      }
+    }
+
+    if (updatedTime) return updatedTime
+    if (updatedBlocks) return updatedBlocks
   }
 
   async deleteOne(slug: any): Promise<UpdateResult[]> {
-    const id = slug
+    const { id } = slug
+    const { user } = this.request
+
+    const findOptions = this.findOptions
+
+    findOptions.where.id = id
+
+    if (user.role !== Role.Admin) {
+      findOptions.where.user = { id: user.id }
+    }
 
     // Check if time exists in database
-    const time = await this.timeRepository.findOneBy(id)
+    const time = await this.timeRepository.findOne(findOptions)
 
-    const blocks = await this.blockRepository.find({ where: { time: id } })
+    const blocks = await this.blockRepository.find({ where: { time: time } })
 
     let deletedTime: UpdateResult
     let deletedBlocks: UpdateResult
 
     if (time) {
-      deletedTime = await this.timeRepository.softDelete(id)
+      deletedTime = await this.timeRepository.softDelete({ id })
     }
 
     if (blocks.length > 0) {
@@ -102,5 +143,14 @@ export class TimesService {
     }
 
     return [deletedTime, deletedBlocks]
+  }
+
+  async deleteOneBlock(slug: any): Promise<DeleteResult> {
+    const { id } = slug
+    const { user } = this.request
+
+    const deletedBlock = await this.blocksService.deleteOne(user, id)
+
+    return deletedBlock
   }
 }

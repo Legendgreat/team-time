@@ -3,20 +3,24 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { Block } from '../blocks/block.entity'
 import { TimeStatus } from './time.interface'
+import { User } from '../users/user.entity'
 
 @Entity()
 export class Time {
   @PrimaryGeneratedColumn()
   id: number
 
-  @Column()
-  userId: number
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'user' })
+  user: User
 
   @Column({ default: Date.now() })
   date: Date

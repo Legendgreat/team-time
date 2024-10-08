@@ -28,6 +28,7 @@ import {
 } from "@mui/material"
 import Grid from "@mui/material/Grid2"
 import { useNavigate, useParams } from "@tanstack/react-router"
+import { useDialogs } from "@toolpad/core/useDialogs"
 import TimeTimeline from "../../common/TimeTimeline"
 import { formatDateIntoString } from "../../utils/dateHelpers"
 import { formatStatusIntoText } from "../../utils/stringHelpers"
@@ -46,19 +47,26 @@ import { FetchError } from "../../interfaces/error.interface"
 import { useEffect, useRef, useState } from "react"
 import DeleteDialog from "../../common/Dialogs/DeleteDialog"
 import Killed from "../../common/Killed"
+import { useSnackbar } from "notistack"
+import {
+  formatMinuteDurationToHourDisplay,
+  formatMinuteDurationToString,
+} from "../../utils/timeHelpers"
 
 const TimeView = () => {
-  const userId = 0
+  const dialogs = useDialogs()
+  const { enqueueSnackbar } = useSnackbar()
   const qc = useQueryClient()
   const navigate = useNavigate()
   const { timeId } = useParams({ strict: false })
   const {
     isPending,
     isError,
+    isSuccess,
     data: time,
     error,
   } = useQuery({
-    queryKey: ["time", { userId, timeId }],
+    queryKey: ["time", { timeId }],
     queryFn: () => getTimeById(parseInt(timeId!)),
     throwOnError: (err: AxiosError & FetchError) => false,
   })
@@ -75,14 +83,9 @@ const TimeView = () => {
 
   const redirectTimerRef = useRef<NodeJS.Timeout>()
 
-  const [isDeleted, setIsDeleted] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  let duration: number
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarMessage, setSnackbarMessage] = useState("This is a snackbar!")
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    (AlertColor & AlertPropsColorOverrides) | undefined
-  >("info")
+  const [isDeleted, setIsDeleted] = useState(false)
 
   if (isPending) return <Loader />
 
@@ -90,82 +93,60 @@ const TimeView = () => {
     return <Error error={error} />
   }
 
+  if (isSuccess) {
+    duration = time.blocks.reduce((a, b) => a + b.duration, 0)
+  }
 
   if (isDeleted) {
     let date = formatDateIntoString(time.date)
     if (date == "Today" || date == "Yesterday") date = date.toLowerCase()
 
-    return <Killed onCancelTimeout={cancelRedirectTimer} message={`Your time from ${date} has been deleted.`} />
+    return (
+      <Killed
+        onCancelTimeout={cancelRedirectTimer}
+        message={`Your time from ${date} has been deleted.`}
+      />
+    )
   }
 
   const submitHandler = () => {
     submitTime(parseInt(timeId!)).then(() => {
-      qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
+      qc.invalidateQueries({ queryKey: ["time", { timeId }] })
     })
   }
 
   const retractHandler = () => {
     retractTime(parseInt(timeId!)).then(() => {
-      qc.invalidateQueries({ queryKey: ["time", { userId, timeId }] })
+      qc.invalidateQueries({ queryKey: ["time", { timeId }] })
     })
   }
 
   const openDelete = () => {
-    setDeleteDialogOpen(true)
-  }
-
-  const closeDelete = () => {
-    setDeleteDialogOpen(false)
-  }
-
-  const openSnackbar = () => {
-    setSnackbarOpen(true)
-  }
-
-  const closeSnackbar = () => {
-    setSnackbarOpen(false)
+    dialogs.open(DeleteDialog, {
+      onAccept: deleteTimeHandler,
+      title: "Time",
+      itemDesc: "this time",
+    })
   }
 
   const deleteTimeHandler = () => {
     deleteTime(parseInt(timeId!))
       .then(() => {
-        qc.invalidateQueries({ queryKey: ["times", { userId }] })
+        qc.invalidateQueries({ queryKey: ["times"] })
         setIsDeleted(true)
         redirectTimerRef.current = setTimeout(() => {
           navigate({ to: "/times" })
         }, 5000)
       })
       .catch(() => {
-        setSnackbarMessage("Failed to delete time.")
-        setSnackbarSeverity("error")
-        openSnackbar()
+        enqueueSnackbar("Failed to delete time.", {
+          variant: "error",
+        })
       })
   }
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={closeSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={closeSnackbar}
-          severity={snackbarSeverity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-      <DeleteDialog
-        open={deleteDialogOpen}
-        onClose={closeDelete}
-        onAccept={deleteTimeHandler}
-        title="Time"
-        itemDesc="this time"
-      />
       <Stack direction="row" spacing={2}>
         <IconButton size="small" onClick={() => navigate({ to: ".." })}>
           <ArrowBack />
@@ -194,6 +175,7 @@ const TimeView = () => {
                 sx={{ display: "flex", flexDirection: "column", gap: 2 }}
               >
                 <Typography>Date</Typography>
+                <Typography>Duration</Typography>
                 <Typography>Status</Typography>
                 {time.managerCommentary && time.status == "denied" && (
                   <Typography>Commentary</Typography>
@@ -204,6 +186,9 @@ const TimeView = () => {
                 sx={{ display: "flex", flexDirection: "column", gap: 2 }}
               >
                 <Typography>{formatDateIntoString(time.date)}</Typography>
+                <Typography>
+                  {formatMinuteDurationToString(duration!)}
+                </Typography>
                 <Typography
                   color={getTextColorFromStatus(time.status)}
                   sx={{

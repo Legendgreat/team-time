@@ -42,11 +42,10 @@ const columns: GridColDef[] = [
 ]
 
 const Times = () => {
-  const userId = 0
   const navigate = useNavigate()
 
   const { isPending, isError, data, error } = useQuery({
-    queryKey: ["times", { userId }],
+    queryKey: ["times"],
     queryFn: () => getTimes(),
   })
 

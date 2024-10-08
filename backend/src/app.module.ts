@@ -1,13 +1,11 @@
-import { DbModule } from './common/modules/db.module'
+import { AuthModule } from './guards/auth/auth.module'
+import { UsersModule } from './users/users.module'
+import { DbModule } from './db/db.module'
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import { TimesModule } from './times/times.module'
 import { DataSource } from 'typeorm'
 @Module({
-  imports: [DbModule, TimesModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [AuthModule, UsersModule, DbModule, TimesModule],
 })
 export class AppModule {
   constructor(private dataSource: DataSource) {}

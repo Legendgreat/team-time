@@ -1,8 +1,9 @@
-import { createRootRoute, Link } from "@tanstack/react-router"
-import Root from "../common/Root"
+import { createRootRouteWithContext, Link } from "@tanstack/react-router"
+import Root from "../pages/Root"
 import { Container, Typography } from "@mui/material"
+import { IRouterContext } from "../router"
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<IRouterContext>()({
   component: Root,
   notFoundComponent: () => {
     return (

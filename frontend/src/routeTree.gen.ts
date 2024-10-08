@@ -11,137 +11,169 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as TimesIndexImport } from './routes/times/index'
-import { Route as TeamIndexImport } from './routes/team/index'
-import { Route as TimesTimeIdIndexImport } from './routes/times/$timeId/index'
-import { Route as TimesTimeIdEditImport } from './routes/times/$timeId/edit'
+import { Route as AuthImport } from './routes/_auth'
+import { Route as AuthIndexImport } from './routes/_auth/index'
+import { Route as AuthTimesIndexImport } from './routes/_auth/times/index'
+import { Route as AuthTeamIndexImport } from './routes/_auth/team/index'
+import { Route as AuthTimesTimeIdIndexImport } from './routes/_auth/times/$timeId/index'
+import { Route as AuthTimesTimeIdEditImport } from './routes/_auth/times/$timeId/edit'
 
 // Create/Update Routes
 
-const IndexRoute = IndexImport.update({
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthIndexRoute = AuthIndexImport.update({
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const TimesIndexRoute = TimesIndexImport.update({
+const AuthTimesIndexRoute = AuthTimesIndexImport.update({
   path: '/times/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const TeamIndexRoute = TeamIndexImport.update({
+const AuthTeamIndexRoute = AuthTeamIndexImport.update({
   path: '/team/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const TimesTimeIdIndexRoute = TimesTimeIdIndexImport.update({
+const AuthTimesTimeIdIndexRoute = AuthTimesTimeIdIndexImport.update({
   path: '/times/$timeId/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
-const TimesTimeIdEditRoute = TimesTimeIdEditImport.update({
+const AuthTimesTimeIdEditRoute = AuthTimesTimeIdEditImport.update({
   path: '/times/$timeId/edit',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
+      parentRoute: typeof rootRoute
+    }
+    '/_auth/': {
+      id: '/_auth/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthIndexImport
+      parentRoute: typeof AuthImport
     }
-    '/team/': {
-      id: '/team/'
+    '/_auth/team/': {
+      id: '/_auth/team/'
       path: '/team'
       fullPath: '/team'
-      preLoaderRoute: typeof TeamIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthTeamIndexImport
+      parentRoute: typeof AuthImport
     }
-    '/times/': {
-      id: '/times/'
+    '/_auth/times/': {
+      id: '/_auth/times/'
       path: '/times'
       fullPath: '/times'
-      preLoaderRoute: typeof TimesIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthTimesIndexImport
+      parentRoute: typeof AuthImport
     }
-    '/times/$timeId/edit': {
-      id: '/times/$timeId/edit'
+    '/_auth/times/$timeId/edit': {
+      id: '/_auth/times/$timeId/edit'
       path: '/times/$timeId/edit'
       fullPath: '/times/$timeId/edit'
-      preLoaderRoute: typeof TimesTimeIdEditImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthTimesTimeIdEditImport
+      parentRoute: typeof AuthImport
     }
-    '/times/$timeId/': {
-      id: '/times/$timeId/'
+    '/_auth/times/$timeId/': {
+      id: '/_auth/times/$timeId/'
       path: '/times/$timeId'
       fullPath: '/times/$timeId'
-      preLoaderRoute: typeof TimesTimeIdIndexImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AuthTimesTimeIdIndexImport
+      parentRoute: typeof AuthImport
     }
   }
 }
 
 // Create and export the route tree
 
+interface AuthRouteChildren {
+  AuthIndexRoute: typeof AuthIndexRoute
+  AuthTeamIndexRoute: typeof AuthTeamIndexRoute
+  AuthTimesIndexRoute: typeof AuthTimesIndexRoute
+  AuthTimesTimeIdEditRoute: typeof AuthTimesTimeIdEditRoute
+  AuthTimesTimeIdIndexRoute: typeof AuthTimesTimeIdIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthIndexRoute: AuthIndexRoute,
+  AuthTeamIndexRoute: AuthTeamIndexRoute,
+  AuthTimesIndexRoute: AuthTimesIndexRoute,
+  AuthTimesTimeIdEditRoute: AuthTimesTimeIdEditRoute,
+  AuthTimesTimeIdIndexRoute: AuthTimesTimeIdIndexRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/team': typeof TeamIndexRoute
-  '/times': typeof TimesIndexRoute
-  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
-  '/times/$timeId': typeof TimesTimeIdIndexRoute
+  '': typeof AuthRouteWithChildren
+  '/': typeof AuthIndexRoute
+  '/team': typeof AuthTeamIndexRoute
+  '/times': typeof AuthTimesIndexRoute
+  '/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
+  '/times/$timeId': typeof AuthTimesTimeIdIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/team': typeof TeamIndexRoute
-  '/times': typeof TimesIndexRoute
-  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
-  '/times/$timeId': typeof TimesTimeIdIndexRoute
+  '/': typeof AuthIndexRoute
+  '/team': typeof AuthTeamIndexRoute
+  '/times': typeof AuthTimesIndexRoute
+  '/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
+  '/times/$timeId': typeof AuthTimesTimeIdIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/team/': typeof TeamIndexRoute
-  '/times/': typeof TimesIndexRoute
-  '/times/$timeId/edit': typeof TimesTimeIdEditRoute
-  '/times/$timeId/': typeof TimesTimeIdIndexRoute
+  '/_auth': typeof AuthRouteWithChildren
+  '/_auth/': typeof AuthIndexRoute
+  '/_auth/team/': typeof AuthTeamIndexRoute
+  '/_auth/times/': typeof AuthTimesIndexRoute
+  '/_auth/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
+  '/_auth/times/$timeId/': typeof AuthTimesTimeIdIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/team' | '/times' | '/times/$timeId/edit' | '/times/$timeId'
+  fullPaths:
+    | ''
+    | '/'
+    | '/team'
+    | '/times'
+    | '/times/$timeId/edit'
+    | '/times/$timeId'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/team' | '/times' | '/times/$timeId/edit' | '/times/$timeId'
   id:
     | '__root__'
-    | '/'
-    | '/team/'
-    | '/times/'
-    | '/times/$timeId/edit'
-    | '/times/$timeId/'
+    | '/_auth'
+    | '/_auth/'
+    | '/_auth/team/'
+    | '/_auth/times/'
+    | '/_auth/times/$timeId/edit'
+    | '/_auth/times/$timeId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  TeamIndexRoute: typeof TeamIndexRoute
-  TimesIndexRoute: typeof TimesIndexRoute
-  TimesTimeIdEditRoute: typeof TimesTimeIdEditRoute
-  TimesTimeIdIndexRoute: typeof TimesTimeIdIndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  TeamIndexRoute: TeamIndexRoute,
-  TimesIndexRoute: TimesIndexRoute,
-  TimesTimeIdEditRoute: TimesTimeIdEditRoute,
-  TimesTimeIdIndexRoute: TimesTimeIdIndexRoute,
+  AuthRoute: AuthRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -156,27 +188,38 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/team/",
-        "/times/",
-        "/times/$timeId/edit",
-        "/times/$timeId/"
+        "/_auth"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
+        "/_auth/",
+        "/_auth/team/",
+        "/_auth/times/",
+        "/_auth/times/$timeId/edit",
+        "/_auth/times/$timeId/"
+      ]
     },
-    "/team/": {
-      "filePath": "team/index.tsx"
+    "/_auth/": {
+      "filePath": "_auth/index.tsx",
+      "parent": "/_auth"
     },
-    "/times/": {
-      "filePath": "times/index.tsx"
+    "/_auth/team/": {
+      "filePath": "_auth/team/index.tsx",
+      "parent": "/_auth"
     },
-    "/times/$timeId/edit": {
-      "filePath": "times/$timeId/edit.tsx"
+    "/_auth/times/": {
+      "filePath": "_auth/times/index.tsx",
+      "parent": "/_auth"
     },
-    "/times/$timeId/": {
-      "filePath": "times/$timeId/index.tsx"
+    "/_auth/times/$timeId/edit": {
+      "filePath": "_auth/times/$timeId/edit.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/times/$timeId/": {
+      "filePath": "_auth/times/$timeId/index.tsx",
+      "parent": "/_auth"
     }
   }
 }
