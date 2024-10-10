@@ -1,12 +1,12 @@
 import { forwardRef, Inject, Injectable, Scope } from '@nestjs/common'
 import { REQUEST } from '@nestjs/core'
 import { InjectRepository } from '@nestjs/typeorm'
-import { BlockService } from 'src/blocks/block.service'
+import { BlockService } from 'src/resources/blocks/block.service'
 import { IGetUserAuthInfoRequest } from 'src/guards/auth/auth.interface'
 import { Role } from 'src/guards/roles/role.enum'
 import { DeleteResult, Repository, UpdateResult } from 'typeorm'
-import { Block } from './../blocks/block.entity'
-import { Time } from './time.entity'
+import { Block } from 'src/resources/blocks/entities/block.entity'
+import { Time } from './entities/time.entity'
 
 @Injectable({ scope: Scope.REQUEST })
 export class TimesService {
@@ -20,8 +20,6 @@ export class TimesService {
     @InjectRepository(Block)
     private readonly blockRepository: Repository<Block>,
   ) {}
-
-  private readonly times: Time[] = []
 
   private readonly findOptions = {
     relations: {

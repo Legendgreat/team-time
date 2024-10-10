@@ -6,10 +6,11 @@ https://docs.nestjs.com/modules
 
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { User } from './user.entity'
+import { User } from './entities/user.entity'
+import { Team } from '../teams/entities/team.entity'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, Team])],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

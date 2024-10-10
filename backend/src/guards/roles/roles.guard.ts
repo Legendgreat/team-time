@@ -4,7 +4,7 @@ https://docs.nestjs.com/guards#guards
 
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { User } from 'src/users/user.entity'
+import { User } from 'src/resources/users/entities/user.entity'
 import { Role } from './role.enum'
 import { ROLES_KEY } from './roles.decorator'
 

@@ -2,7 +2,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import * as bcrypt from 'bcrypt'
 import { Seeder } from 'nestjs-seeder'
 import { Repository } from 'typeorm'
-import { User } from './user.entity'
+import { User } from './entities/user.entity'
 import { Role } from 'src/guards/roles/role.enum'
 
 export default class UserSeeder implements Seeder {

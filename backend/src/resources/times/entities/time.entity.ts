@@ -9,9 +9,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Block } from '../blocks/block.entity'
-import { TimeStatus } from './time.interface'
-import { User } from '../users/user.entity'
+import { Block } from 'src/resources/blocks/entities/block.entity'
+import { TimeStatus } from '../time.interface'
+import { User } from 'src/resources/users/entities/user.entity'
 
 @Entity()
 export class Time {

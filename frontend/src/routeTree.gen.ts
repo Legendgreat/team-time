@@ -15,6 +15,8 @@ import { Route as AuthImport } from './routes/_auth'
 import { Route as AuthIndexImport } from './routes/_auth/index'
 import { Route as AuthTimesIndexImport } from './routes/_auth/times/index'
 import { Route as AuthTeamIndexImport } from './routes/_auth/team/index'
+import { Route as AuthAdminIndexImport } from './routes/_auth/admin/index'
+import { Route as AuthAdminTeamsImport } from './routes/_auth/admin/teams'
 import { Route as AuthTimesTimeIdIndexImport } from './routes/_auth/times/$timeId/index'
 import { Route as AuthTimesTimeIdEditImport } from './routes/_auth/times/$timeId/edit'
 
@@ -37,6 +39,16 @@ const AuthTimesIndexRoute = AuthTimesIndexImport.update({
 
 const AuthTeamIndexRoute = AuthTeamIndexImport.update({
   path: '/team/',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthAdminIndexRoute = AuthAdminIndexImport.update({
+  path: '/admin/',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthAdminTeamsRoute = AuthAdminTeamsImport.update({
+  path: '/admin/teams',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -66,6 +78,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthIndexImport
+      parentRoute: typeof AuthImport
+    }
+    '/_auth/admin/teams': {
+      id: '/_auth/admin/teams'
+      path: '/admin/teams'
+      fullPath: '/admin/teams'
+      preLoaderRoute: typeof AuthAdminTeamsImport
+      parentRoute: typeof AuthImport
+    }
+    '/_auth/admin/': {
+      id: '/_auth/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthAdminIndexImport
       parentRoute: typeof AuthImport
     }
     '/_auth/team/': {
@@ -103,6 +129,8 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
+  AuthAdminTeamsRoute: typeof AuthAdminTeamsRoute
+  AuthAdminIndexRoute: typeof AuthAdminIndexRoute
   AuthTeamIndexRoute: typeof AuthTeamIndexRoute
   AuthTimesIndexRoute: typeof AuthTimesIndexRoute
   AuthTimesTimeIdEditRoute: typeof AuthTimesTimeIdEditRoute
@@ -111,6 +139,8 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
+  AuthAdminTeamsRoute: AuthAdminTeamsRoute,
+  AuthAdminIndexRoute: AuthAdminIndexRoute,
   AuthTeamIndexRoute: AuthTeamIndexRoute,
   AuthTimesIndexRoute: AuthTimesIndexRoute,
   AuthTimesTimeIdEditRoute: AuthTimesTimeIdEditRoute,
@@ -122,6 +152,8 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
   '/': typeof AuthIndexRoute
+  '/admin/teams': typeof AuthAdminTeamsRoute
+  '/admin': typeof AuthAdminIndexRoute
   '/team': typeof AuthTeamIndexRoute
   '/times': typeof AuthTimesIndexRoute
   '/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
@@ -130,6 +162,8 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
+  '/admin/teams': typeof AuthAdminTeamsRoute
+  '/admin': typeof AuthAdminIndexRoute
   '/team': typeof AuthTeamIndexRoute
   '/times': typeof AuthTimesIndexRoute
   '/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
@@ -140,6 +174,8 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_auth': typeof AuthRouteWithChildren
   '/_auth/': typeof AuthIndexRoute
+  '/_auth/admin/teams': typeof AuthAdminTeamsRoute
+  '/_auth/admin/': typeof AuthAdminIndexRoute
   '/_auth/team/': typeof AuthTeamIndexRoute
   '/_auth/times/': typeof AuthTimesIndexRoute
   '/_auth/times/$timeId/edit': typeof AuthTimesTimeIdEditRoute
@@ -151,16 +187,27 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/'
+    | '/admin/teams'
+    | '/admin'
     | '/team'
     | '/times'
     | '/times/$timeId/edit'
     | '/times/$timeId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/team' | '/times' | '/times/$timeId/edit' | '/times/$timeId'
+  to:
+    | '/'
+    | '/admin/teams'
+    | '/admin'
+    | '/team'
+    | '/times'
+    | '/times/$timeId/edit'
+    | '/times/$timeId'
   id:
     | '__root__'
     | '/_auth'
     | '/_auth/'
+    | '/_auth/admin/teams'
+    | '/_auth/admin/'
     | '/_auth/team/'
     | '/_auth/times/'
     | '/_auth/times/$timeId/edit'
@@ -195,6 +242,8 @@ export const routeTree = rootRoute
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/",
+        "/_auth/admin/teams",
+        "/_auth/admin/",
         "/_auth/team/",
         "/_auth/times/",
         "/_auth/times/$timeId/edit",
@@ -203,6 +252,14 @@ export const routeTree = rootRoute
     },
     "/_auth/": {
       "filePath": "_auth/index.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/admin/teams": {
+      "filePath": "_auth/admin/teams.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/admin/": {
+      "filePath": "_auth/admin/index.tsx",
       "parent": "/_auth"
     },
     "/_auth/team/": {

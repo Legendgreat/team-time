@@ -1,5 +1,5 @@
 import { Role } from 'src/guards/roles/role.enum'
-import { Time } from 'src/times/time.entity'
+import { Time } from 'src/resources/times/entities/time.entity'
 
 export interface UserData {
   username: string

@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
-import { Time } from '../times/time.entity'
+import { Time } from 'src/resources/times/entities/time.entity'
 
 @Entity()
 export class Block {

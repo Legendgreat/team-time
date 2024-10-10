@@ -1,4 +1,4 @@
-import { BlockData } from 'src/blocks/block.interface'
+import { BlockData } from 'src/resources/blocks/block.interface'
 
 export type TimeStatus = 'approved' | 'denied' | 'draft' | 'pending'
 

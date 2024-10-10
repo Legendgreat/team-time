@@ -5,10 +5,10 @@ https://docs.nestjs.com/providers#services
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Role } from 'src/guards/roles/role.enum'
-import { Time } from 'src/times/time.entity'
-import { User } from 'src/users/user.entity'
+import { Time } from 'src/resources/times/entities/time.entity'
+import { User } from 'src/resources/users/entities/user.entity'
 import { DeleteResult, Repository } from 'typeorm'
-import { Block } from './block.entity'
+import { Block } from './entities/block.entity'
 
 @Injectable()
 export class BlockService {

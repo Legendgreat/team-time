@@ -1,10 +1,10 @@
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { seeder } from 'nestjs-seeder'
 import { options } from './db/data-source'
-import { User } from './users/user.entity'
-import UserSeeder from './users/user.seeder'
-import { Time } from './times/time.entity'
-import { Block } from './blocks/block.entity'
+import { User } from './resources/users/entities/user.entity'
+import UserSeeder from './resources/users/user.seeder'
+import { Time } from './resources/times/entities/time.entity'
+import { Block } from './resources/blocks/entities/block.entity'
 
 seeder({
   imports: [

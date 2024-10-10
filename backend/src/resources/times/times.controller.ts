@@ -4,11 +4,11 @@ https://docs.nestjs.com/controllers#controllers
 
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiCreatedResponse } from '@nestjs/swagger'
-import { Block } from 'src/blocks/block.entity'
+import { Block } from 'src/resources/blocks/entities/block.entity'
 import { Role } from 'src/guards/roles/role.enum'
 import { Roles } from 'src/guards/roles/roles.decorator'
 import { DeleteResult, UpdateResult } from 'typeorm'
-import { Time } from './time.entity'
+import { Time } from './entities/time.entity'
 import { TimesService } from './times.service'
 
 @Controller('times')

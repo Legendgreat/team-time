@@ -1,15 +1,18 @@
-import { Time } from '../times/time.entity'
+import { Time } from '../../times/entities/time.entity'
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 import { UUID } from 'crypto'
 import { Role } from 'src/guards/roles/role.enum'
+import { Team } from 'src/resources/teams/entities/team.entity'
 
 @Entity()
 export class User {
@@ -33,6 +36,12 @@ export class User {
 
   @Column({ default: 'user' })
   role: Role
+
+  @OneToMany(() => Team, (team) => team.manager)
+  managesTeams: Team[]
+
+  @ManyToMany(() => Team, (team) => team.members)
+  teams: Team[]
 
   @Column({ default: true })
   enabled: boolean
