@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
-import AdminPanel from "../../../pages/Admin/AdminPanel"
-import { Role } from "../../../enums/role.enum"
+import AdminTeams from "../../../../pages/Admin/Teams/AdminTeams"
+import { Role } from "../../../../enums/role.enum"
 
-export const Route = createFileRoute("/_auth/admin/")({
+export const Route = createFileRoute("/_auth/admin/teams/")({
   beforeLoad: ({ context }) => {
     if (context.auth.user?.role !== Role.Admin) {
       throw redirect({
@@ -10,5 +10,5 @@ export const Route = createFileRoute("/_auth/admin/")({
       })
     }
   },
-  component: AdminPanel,
+  component: AdminTeams,
 })

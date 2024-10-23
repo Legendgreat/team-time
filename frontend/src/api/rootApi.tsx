@@ -4,6 +4,7 @@ type Method = "get" | "post" | "put" | "delete"
 
 interface FetchItemOptions {
   method: Method
+  params?: unknown
   body?: unknown
 }
 
@@ -36,7 +37,7 @@ export const query = async <T,>(
   url: string,
   options: FetchItemOptions
 ): Promise<T> => {
-  const { method, body } = options
+  const { method, params, body } = options
   const headers = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -46,6 +47,7 @@ export const query = async <T,>(
   return await axios({
     url,
     method,
+    params,
     headers,
     data: body ?? undefined,
   }).then((res: AxiosResponse<T>) => {

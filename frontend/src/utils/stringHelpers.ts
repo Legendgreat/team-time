@@ -1,4 +1,4 @@
-import { TimeStatus } from "../types/Time"
+import { TimeStatus } from "../interfaces/time.interface"
 
 export const formatStatusIntoText = (status: TimeStatus) => {
   switch (status) {
@@ -13,4 +13,12 @@ export const formatStatusIntoText = (status: TimeStatus) => {
     default:
       return "Invalid Status"
   }
+}
+
+export const convertFullNameToLetters = (fullName: string) => {
+  const names = fullName.split(" ")
+  const letters = [names[0], names[names.length - 1]].map((name) =>
+    name.substring(0, 1)
+  )
+  return letters.join("")
 }

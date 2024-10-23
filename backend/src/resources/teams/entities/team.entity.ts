@@ -5,6 +5,7 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -23,9 +24,11 @@ export class Team {
   description?: string
 
   @ManyToOne(() => User, (user) => user.managesTeams, { nullable: true })
+  @JoinColumn()
   manager?: User
 
   @ManyToMany(() => User, (user) => user.teams, { nullable: true })
+  @JoinTable()
   members?: User[]
 
   @Column({ default: true })

@@ -22,14 +22,13 @@ const router = createRouter({
   defaultPreload: "intent",
 })
 
-const TanStackRouterDevtools =
-  import.meta.env.NODE_ENV === "production"
-    ? () => null
-    : React.lazy(() =>
-        import("@tanstack/router-devtools").then((res) => ({
-          default: res.TanStackRouterDevtools,
-        }))
-      )
+const TanStackRouterDevtools = import.meta.env.PROD
+  ? () => null
+  : React.lazy(() =>
+      import("@tanstack/router-devtools").then((res) => ({
+        default: res.TanStackRouterDevtools,
+      }))
+    )
 
 declare module "@tanstack/react-router" {
   interface Register {

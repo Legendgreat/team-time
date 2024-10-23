@@ -1,4 +1,4 @@
-import { TimeStatus } from "../types/Time"
+import { TimeStatus } from "../interfaces/time.interface"
 
 export const getTextColorFromStatus = (status: TimeStatus) => {
   switch (status) {

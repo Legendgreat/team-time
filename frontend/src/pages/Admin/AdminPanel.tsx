@@ -1,12 +1,5 @@
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  Container,
-  Typography,
-} from "@mui/material"
+import { Container } from "@mui/material"
 import { useNavigate } from "@tanstack/react-router"
-import React from "react"
 import AdminPanelCard from "./AdminPanelCard"
 
 type Props = {}

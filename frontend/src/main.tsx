@@ -10,8 +10,12 @@ import "./index.css"
 import { StrictMode } from "react"
 import axios from "axios"
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL
-console.log("[VITE_API_URL]", import.meta.env.VITE_API_URL)
+if (import.meta.env.DEV) {
+  axios.defaults.baseURL = import.meta.env.VITE_API_URL
+  console.log("[VITE_API_URL]", import.meta.env.VITE_API_URL)
+} else {
+  axios.defaults.baseURL = "https://legendigi.com/api"
+}
 
 const rootElement = document.getElementById("root")!
 
